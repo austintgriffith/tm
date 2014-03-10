@@ -1,9 +1,8 @@
 var tm = angular.module('tm', ['ngRoute']);
 
-
-
 function tmController($scope, $http, $timeout, $sce,$window)
 {	
+    $scope.topstuff = window.screen.width;
 
   	$scope.status = "Loading...";
 
@@ -36,7 +35,7 @@ function tmController($scope, $http, $timeout, $sce,$window)
 
   	$scope.login =function(item){
   		console.log("login");
-  		$window.location.href = "https://m.facebook.com/dialog/oauth?client_id=227668560771596&redirect_uri=http://"+phphost+"";
+  		$window.location.href = "https://m.facebook.com/dialog/oauth?client_id=227668560771596&redirect_uri=http://"+phphost+"/"+page;
   	}
 
   	$scope.logout =function(item){
@@ -155,7 +154,7 @@ function tmController($scope, $http, $timeout, $sce,$window)
 	  			if(item.likes[i]==facebookid) {console.log('already liked!');return;}
 	  		}
 	  	}
-  		senddata = {'heart':item.id, 'user':facebookid};
+  		senddata = {'heart':item.id, 'user':facebookid, 'page':page};
 
   		$http.post('/api/',senddata)
     	.success(function(data, status, headers, config) {
@@ -180,7 +179,7 @@ function tmController($scope, $http, $timeout, $sce,$window)
   		if($scope.inputtext!="")
   		{
 	  		$scope.callStart = Date.now();
-	  		var senddata = {'text': $scope.inputtext, 'user':facebookid};
+	  		var senddata = {'text': $scope.inputtext, 'user':facebookid, 'page':page};
 			$scope.inputtext="";
 			console.log("SENDING:");
 			console.log(senddata);
@@ -202,7 +201,7 @@ function tmController($scope, $http, $timeout, $sce,$window)
     	$scope.colorAlreadySet=0;
     	$scope.callStart = Date.now();
     	console.log("GET hash="+$scope.currentHash);
-    	$http({method: 'GET', url: '/api/?hash='+$scope.currentHash}).
+    	$http({method: 'GET', url: '/api/?hash='+$scope.currentHash+'&page='+page}).
 	    success(function(data, status, headers, config) {
 
         //hide the loading screen...

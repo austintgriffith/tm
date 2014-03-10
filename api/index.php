@@ -32,9 +32,10 @@ if($_FILES)//if a file was uploaded // move it to s3 and provide a link
 			{
 				//upload $filepath to s3...
 				$s3 = new AwsS3Client($creds->key,$creds->secret,$creds->region);
-				$url = $s3->putPublicObject("trustymusket",date("Ymd")."/".microtime_float().$file['name'],$filepath);
+				$url = $s3->putPublicObject("throit",date("Ymd")."/".microtime_float().$file['name'],$filepath);
 				$postdata = array();
 				$postdata['user']=$_REQUEST['user'];
+				$postdata['page']=$_REQUEST['page'];
 				$postdata['text']=$url;
 				$postdata=json_encode($postdata);
 				$doredirect=true;
@@ -51,7 +52,9 @@ if($postdata)
 {
 	$postdata = json_decode($postdata,true);
 	$postdata['text'] = urlencode($postdata['text']);
-	$currentData = json_decode($cache->get($today));
+	$page = $postdata['page'];
+	unset($postdata['page']);
+	$currentData = json_decode($cache->get($today."_".$page));
 	if(!$currentData) $currentData=array();
 	//echo "CURRENT:";
 	print_r($currentData);
@@ -114,8 +117,8 @@ if($postdata)
 	$encodedData = json_encode($currentData);
 	echo "1md5 of:$encodedData\n";
 	$newHash = md5($encodedData);
-	$cache->set($today,$encodedData);
-	$cache->set($today."_hash",$newHash);
+	$cache->set($today."_".$page,$encodedData);
+	$cache->set("hash_".$today."_".$page,$newHash);
 	//echo "HASH:".$newHash;
 	flush();
 
@@ -141,7 +144,7 @@ if($postdata)
         	//update to be a preview/link to the image
         	//echo "UPDATING AS IMG SRC";
         	$founditemat = -1;
-        	$currentData = json_decode($cache->get($today));
+        	$currentData = json_decode($cache->get($today."_".$page));
 
         	foreach($currentData as $item)
         	{
@@ -153,10 +156,8 @@ if($postdata)
         		{
         			echo "\nFOUND ITEM:";
         			print_r($item);
-        			break;
-        			
+        			break;	
         		}
-
         	}
         	if($founditemat!=-1)
         	{
@@ -169,30 +170,20 @@ if($postdata)
         		//print_r($currentData[$founditemat]);
         		$encodedData = json_encode($currentData);
 				$newHash = md5($encodedData);
-				$cache->set($today,$encodedData);
-				$cache->set($today."_hash",$newHash);
+				$cache->set($today."_".$page,$encodedData);
+				$cache->set("hash_".$today."_".$page,$newHash);
 				echo "NEWHASHer:".$newHash."\nFROM:".$encodedData."\n";
-
-
         	}
-        	
         }
-
-		
-		
 	}
-
-
-
-
 	$db->put(array('day'=>$today,'json'=>$encodedData));
-
 }
 else
 {
 	//list all items
+	$page = $_GET['page'];
 	$theirHash = $_GET['hash'];
-	$currentHash  = $cache->get($today."_hash");
+	$currentHash  = $cache->get("hash_".$today."_".$page);
 
 	$delayCount=0;
 
@@ -205,17 +196,17 @@ else
 		{
 			usleep(250000);//0.25 second wait (250ms)
 			$delayCount++;
-			$currentHash = $cache->get($today."_hash");
+			$currentHash = $cache->get("hash_".$today."_".$page);
 		}
 	}
 
 	if(@$_GET['clear'])
 	{
-		$cache->expire($today."_hash",0);
-		$cache->expire($today,0);	
+		$cache->expire("hash_".$today."_".$page,0);
+		$cache->expire($today."_".$page,0);	
 	}
 
-	echo $cache->get($today);
+	echo $cache->get($today."_".$page);
 }
 
 
@@ -226,7 +217,7 @@ if($doredirect)
 {
 	?>
 		<script>
-			window.location = "/";
+			window.location = "<?php echo($_SERVER["HTTP_REFERER"]); ?>";
 		</script>
 	<?php
 }

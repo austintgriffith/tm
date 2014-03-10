@@ -1,8 +1,13 @@
-<!DOCTYPE html>
+<?php
+	$page = trim($_SERVER['REQUEST_URI'],'/');
+	$qat = strpos($page,"?");
+	if($qat) $page = substr($page,0,$qat);
+	if(!$page) header('Location:demo');
+?><!DOCTYPE html>
 <?php date_default_timezone_set("America/Denver"); ?>
 <html ng-app="tm">
 <head>
-    <title>Trusty Musket</title>
+    <title><?php echo($page) ?></title>
     <meta name = "viewport" content = "width=device-width,user-scalable=no">
     <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="style.css">
@@ -19,9 +24,8 @@
 	<script>
 		var phphost = "<?php echo($_SERVER['HTTP_HOST']); ?>";
 		var loading = false;
+		var page = "<?php echo($page); ?>";
 	</script>
-    
-    	<div class='floattitle'><?php echo date("Y.m.d"); ?></div>
     	<form ng-submit="go()" style='padding-bottom:50px;'>
 
 			<input id="inputline" type="text" ng-model="inputtext" class="text-line"/>
@@ -39,6 +43,7 @@
 		</form>
 		<form id='form' action='/api/' method='POST' enctype="multipart/form-data">
 			<input type='hidden' id='fileuserid' name='user'>
+			<input type='hidden' id='page' name='page' value='<?php echo($page); ?>'>
 			<input type="file" name="file" id="file" style='position:absolute;left:-1000px'>
 		</form>
 		<script>
@@ -60,6 +65,10 @@
 		    	document.getElementById("form").submit();
 			};
 		</script>
+
+
+		<div class='floattitle' style='{{daytitlestyle}}'><?php echo date("Y.m.d"); ?></div>
+    	<div class='floatlefttitle' style='{{pagetitlestyle}}'><?php echo $page; ?></div>
 
     	<div ng-repeat="item in currentData" class='contentbox'>
     		<div class='face'>

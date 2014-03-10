@@ -135,7 +135,6 @@ transition: opacity 1s ease-in-out;
     top:5px;
     border:1px solid rgba(222, 222, 222, 0.4);
     padding:4px;
-    
     opacity:0.7;
     font-size:24px;
     z-index:99;
@@ -146,11 +145,24 @@ transition: opacity 1s ease-in-out;
     top:0px;
     right:0px;
     opacity:0.2;
-    margin-top:50px;
-    font-size:60px;
+    font-size:24px;
+    margin-top:70px;
+    margin-right:5px;
     font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
    font-weight: bolder;
 }
+.floatlefttitle{
+    position:fixed;
+    top:0px;
+    left:0px;
+    opacity:0.2;
+     font-size:24px;
+    margin-top:70px;
+    margin-left:5px;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+   font-weight: bolder;
+}
+
 
 .heartpics{
     margin-top:9px;
